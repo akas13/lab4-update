@@ -1,4 +1,3 @@
-
 package de.tuhh.diss.harborstorage;
 
 import de.tuhh.diss.harborstorage.sim.PhysicalCrane;
@@ -21,7 +20,7 @@ public class CraneControl  {
 		moveToX(x);
 		moveToY(y);
 		shutdown();
-		// : Add your own code. 
+		// : Add your own code. TODO: review this pending our changes in HSM 12/19/16 
 	}
 	
 	public StorageElement retrievePacket(int x, int y) {
@@ -38,7 +37,7 @@ public class CraneControl  {
 		CR.unloadElement();
 		shutdown();
 		return packet; // : Replace this with your own code. 
-		// TODO How do we return packet without setting its value
+		// TODO How do we return packet without setting its value review this pending our changes in HSM 12/19/16 
 	}
 	
 	public void shutdown() {

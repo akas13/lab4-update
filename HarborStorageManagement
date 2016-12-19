@@ -11,7 +11,7 @@ import de.tuhh.diss.harborstorage.sim.StoragePlace;
 public class HarborStorageManagement implements HighBayStorage {
 	private CraneControl CC;
 	private Packet packet;
-	private Slot slot;// : do we have to create slot sizes/where do we put this?>no
+	private Slot[] slot;// : do we have to create slot sizes/where do we put this?>no
 	private PhysicalCrane cr;
 	private PhysicalHarborStorage phs;
 	private StoragePlace[] SP;
@@ -21,16 +21,17 @@ public class HarborStorageManagement implements HighBayStorage {
 	cr=phs.getCrane();	
 	SP=phs.getStoragePlacesAsArray();
 	CC = new CraneControl(cr); // crane controler within the HSM constructor
-	numPacketStored =0;	
+	numPacketStored =0;
+	slot = makeSlotArray(slot); 
 	}
 	
-	final static public int NUM_SLOTS = 29;
+	//final static public int NUM_SLOTS = 29;
 	
 	public int storePacket(int width, int height, int depth, String description, int weight) throws StorageException {
 		packet= new Packet( width,  height,  depth,  description,  weight);
-		slot = findSutiable(packet);
-		int x=slot.getPositionX();
-		int y=slot.getPositionY();
+		int sslot = findSutiable(packet);
+		int x=slot[sslot].getPositionX();
+		int y=slot[sslot].getPositionY();
 		CC.storePacket(x, y, packet);
 		numPacketStored++;
 				return 0; // : Replace this with your own code. return 0 is there for the throws?
@@ -44,9 +45,6 @@ public class HarborStorageManagement implements HighBayStorage {
 		String des = packetArray[count].getDescription();
 		if (des!=description){
 		while (packetArray[count]!=null || des!=description){
-			
-			
-			
 			count++;
 			des = packetArray[count].getDescription();}
 		}
@@ -55,13 +53,13 @@ public class HarborStorageManagement implements HighBayStorage {
 		int ID=0;
 		count=0;
 		if (id!=ID){
-			while (SP[count]!=null || id!=ID){
+			while (slot[count]!=null || id!=ID){
 				
 				count++;
-				id = SP[count].getNumber();}
+				id = slot[count].getNumber();}
 			}
-		int x = SP[count].getPositionX();
-		int y = SP[count].getPositionY();
+		int x = slot[count].getPositionX();
+		int y = slot[count].getPositionY();
 		
 		CC.retrievePacket(x,y);
 		numPacketStored--;
@@ -72,9 +70,9 @@ public class HarborStorageManagement implements HighBayStorage {
 		Packet[] packetArray;
 		int count = 0;
 		packetArray= new Packet [numPacketStored];
-		for(int i=0; i<=29; i++){
-			if (SP[i]!=null){
-				packetArray[count] = (Packet) SP[i]; //added (packet) cast, no idea what this does...
+		for(int i=0; i<=SP.length; i++){
+			if (slot[i].getContainPacket()!=null){
+				packetArray[count] = slot[i].getContainPacket(); //added (packet) cast, no idea what this does...
 				count++;
 			}
 		}
@@ -86,48 +84,57 @@ public class HarborStorageManagement implements HighBayStorage {
 		CC.shutdown();
 		// : Add your own code. 
 	}
-	private Slot findSutiable(Packet p){
-	int voldiff [];
-	voldiff=new int [29];
-	int weightdiff[];
-	weightdiff= new int [29]; //TODO do we just want to create a final constant for the size so it can be changed?
-		for(int i=0; i<30; i++){
-			if (SP[i]==null && p.getWidth() <= SP[i].getWidth() && p.getHeight() <= SP[i].getHeight() && 
-					p.getDepth() <= SP[i].getDepth() && p.getWeight()<=SP[i].getLoadCapacity()){
-				int volsp=SP[i].getWidth()*SP[i].getHeight()*SP[i].getDepth();
+	private int findSutiable(Packet p){
+	int tempslot = 0;
+	double tsqdiff = 0;
+	//int tvoldiff;
+	//int tweidiff;
+	//voldiff=new int [29];
+	//int weightdiff[];
+	//weightdiff= new int [29]; //TODO do we just want to create a final constant for the size so it can be changed?
+		for(int i=0; i<=SP.length; i++){
+			if (slot[i].getContainPacket()==null && p.getWidth() <= slot[i].getWidth() && p.getHeight() <= slot[i].getHeight() && 
+					p.getDepth() <= slot[i].getDepth() && p.getWeight()<=slot[i].getLoadCapacity()){
+				int volsp=slot[i].getWidth()*slot[i].getHeight()*slot[i].getDepth();
 				int volp=p.getWidth()*p.getHeight()*p.getDepth();
-				voldiff[i]= volsp-volp;
-				weightdiff[i]=SP[i].getLoadCapacity()-p.getWeight();
+				int voldiff = volsp-volp;
+				int weightdiff=slot[i].getLoadCapacity()-p.getWeight();
+				double sqdiff = Math.sqrt(weightdiff*weightdiff + voldiff*voldiff);
 			
-				if(voldiff[i]==0 && weightdiff[i]==0){
-					slot=new Slot (SP[i].getNumber(), SP[i].getWidth(),SP[i].getHeight(), SP[i].getDepth(), 
-							SP[i].getPositionX(), SP[i].getPositionY(), SP[i].getLoadCapacity()  ) ;
+				if(voldiff==0 && weightdiff==0){
+					tempslot = i;
 					break;
+					} else if(tempslot == 0){
+						tempslot = i;
+						tsqdiff = sqdiff;
+					} else if(tempslot>0 && sqdiff<tsqdiff){
+						tempslot = i;
+						tsqdiff = sqdiff;
 					}
 				}
 			}
 		
-		int volmin= voldiff[0];
+		/*int volmin= voldiff[0];
 		int weightmin= weightdiff[0];
 		for(int i=0; i<30; i++){
 			if (voldiff[i] <= volmin ||weightdiff[i]<weightmin){
-				slot=new Slot (SP[i].getNumber(), SP[i].getWidth(),SP[i].getHeight(), SP[i].getDepth(),
+				slot[]=new Slot (SP[i].getNumber(), SP[i].getWidth(),SP[i].getHeight(), SP[i].getDepth(),
 						SP[i].getPositionX(), SP[i].getPositionY(), SP[i].getLoadCapacity()  ) ;
 				break;
 			}
-		}
-		return slot; // : Replace this with your own code. slot may have to be an array
+		}*/
+		return tempslot; // : Replace this with your own code.
 	}
 	
-	private Slot[] makeSlotArray(StoragePlace[] sp){
-		Slot slot[];
-		slot = new Slot[NUM_SLOTS];
-		for (int i = 0; i<=NUM_SLOTS;i++){
-			slot[i](SP[i].getNumber, SP[i].getWidth, SP[i].getHeight(), SP[i].getDepth(), 
-					SP[i].getPositionX(),SP[i].getPositionY(), SP[i].getLoadCapacity());
-			
+	private Slot[] makeSlotArray(Slot[] s){
+		s = new Slot[SP.length];
+		for (int i = 0; i<=SP.length;i++){
+			s[i]=new Slot(SP[i].getNumber(), SP[i].getWidth(), SP[i].getHeight(), SP[i].getDepth(), 
+					SP[i].getPositionX(),SP[i].getPositionY(), SP[i].getLoadCapacity()); //use this to call the slots out in the find sutiable initialize get packet with null
+			s[i].setContainPacket(null);
+	
 		}
-		
-		return slot[];
+	
+		return s;
 	}
 }
