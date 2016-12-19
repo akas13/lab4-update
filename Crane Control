@@ -1,0 +1,80 @@
+
+package de.tuhh.diss.harborstorage;
+
+import de.tuhh.diss.harborstorage.sim.PhysicalCrane;
+import de.tuhh.diss.harborstorage.sim.StorageElement;
+
+
+public class CraneControl  {
+	private PhysicalCrane CR;
+	public CraneControl (PhysicalCrane cr){
+		CR = cr;
+		// what to set cr to in the constructor
+	}
+	public void storePacket(int x, int y, StorageElement packet) {
+		CR.loadElement(packet);
+		moveToX(x);
+		moveToY(y);
+		CR.storeElement();
+		x=CR.getLoadingPosX();
+		y=CR.getLoadingPosY();
+		moveToX(x);
+		moveToY(y);
+		shutdown();
+		// : Add your own code. 
+	}
+	
+	public StorageElement retrievePacket(int x, int y) {
+		Packet packet;
+		
+		moveToX(x);
+		moveToY(y);
+		packet=null;
+		CR.retrieveElement();
+		x=CR.getLoadingPosX();
+		y=CR.getLoadingPosY();
+		moveToX(x);
+		moveToY(y);
+		CR.unloadElement();
+		shutdown();
+		return packet; // : Replace this with your own code. 
+		// TODO How do we return packet without setting its value
+	}
+	
+	public void shutdown() {
+		CR.shutdown(); // : Add your own code. 
+	}
+	private int moveToX(int x) {
+		int posx=0;
+		posx=CR.getPositionX();
+		while (x!=posx){
+			if (posx<x){
+				CR.forward();
+			posx=CR.getLoadingPosX();
+			}
+			else if (posx>x){
+				CR.backward();
+			posx=CR.getLoadingPosX();
+			}
+			//: if error, then add an else...combine Y for extra points?
+		}
+		CR.stopX();
+		return posx; // : Replace this with your own code.
+	}
+	private int moveToY(int y) {
+		int posy=0;
+		posy=CR.getPositionY();
+		while (y!=posy){
+			if (posy<y){
+				CR.forward();
+			posy=CR.getLoadingPosY();
+			}
+			else if (posy>y){
+				CR.backward();
+			posy=CR.getLoadingPosY();
+			}	
+		}
+		CR.stopY();
+		return posy; // : Replace this with your own code.
+	
+	}}
