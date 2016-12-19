@@ -10,7 +10,7 @@ public class Slot implements StoragePlace {
 	private int PositionX;
 	private int PositionY;
 	private int LoadCapacity;
-	private double ContainPacket;
+	private Packet ContainPacket;
 	
 	public Slot (int num, int wi, int hi, int di, int xpo, int ypo, int lcap) {
 		Number=num;
@@ -56,11 +56,11 @@ public class Slot implements StoragePlace {
 		int ypo=PositionY;
 		return ypo; // : Replace this with your own code. 
 	}
-	public double getContainPacket(){
-		double cp=ContainPacket;
-		return cp; //  Replace this with your own code.
+	public Packet getContainPacket(){
+		Packet cp=ContainPacket;
+		return cp; //TODO:  Replace this with your own code.
 	}
-	public void setContainPacket(double cp){
+	public void setContainPacket(Packet cp){
 		ContainPacket=cp; // Replace this with your own code.
 	}
 }
