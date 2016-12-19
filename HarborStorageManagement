@@ -1,0 +1,133 @@
+package de.tuhh.diss.harborstorage;
+
+import de.tuhh.diss.harborstorage.sim.HighBayStorage;
+import de.tuhh.diss.harborstorage.sim.StorageException;
+import de.tuhh.diss.harborstorage.sim.PhysicalCrane;
+import de.tuhh.diss.harborstorage.sim.PhysicalHarborStorage;
+import de.tuhh.diss.harborstorage.sim.StoragePlace;
+
+
+
+public class HarborStorageManagement implements HighBayStorage {
+	private CraneControl CC;
+	private Packet packet;
+	private Slot slot;// : do we have to create slot sizes/where do we put this?>no
+	private PhysicalCrane cr;
+	private PhysicalHarborStorage phs;
+	private StoragePlace[] SP;
+	private int numPacketStored;
+	public HarborStorageManagement (){
+	
+	cr=phs.getCrane();	
+	SP=phs.getStoragePlacesAsArray();
+	CC = new CraneControl(cr); // crane controler within the HSM constructor
+	numPacketStored =0;	
+	}
+	
+	final static public int NUM_SLOTS = 29;
+	
+	public int storePacket(int width, int height, int depth, String description, int weight) throws StorageException {
+		packet= new Packet( width,  height,  depth,  description,  weight);
+		slot = findSutiable(packet);
+		int x=slot.getPositionX();
+		int y=slot.getPositionY();
+		CC.storePacket(x, y, packet);
+		numPacketStored++;
+				return 0; // : Replace this with your own code. return 0 is there for the throws?
+	}
+	
+	public void retrievePacket(String description) throws StorageException {
+		Packet[] packetArray;
+		
+		packetArray=getPackets();
+		int count=0;
+		String des = packetArray[count].getDescription();
+		if (des!=description){
+		while (packetArray[count]!=null || des!=description){
+			
+			
+			
+			count++;
+			des = packetArray[count].getDescription();}
+		}
+		int id=packetArray[count].getId();
+		
+		int ID=0;
+		count=0;
+		if (id!=ID){
+			while (SP[count]!=null || id!=ID){
+				
+				count++;
+				id = SP[count].getNumber();}
+			}
+		int x = SP[count].getPositionX();
+		int y = SP[count].getPositionY();
+		
+		CC.retrievePacket(x,y);
+		numPacketStored--;
+		// : Add your own code. 
+	}
+	
+	public Packet[] getPackets() {
+		Packet[] packetArray;
+		int count = 0;
+		packetArray= new Packet [numPacketStored];
+		for(int i=0; i<=29; i++){
+			if (SP[i]!=null){
+				packetArray[count] = (Packet) SP[i]; //added (packet) cast, no idea what this does...
+				count++;
+			}
+		}
+		
+		return packetArray; // : Replace this with your own code. 
+	}
+	
+	public void shutdown() {
+		CC.shutdown();
+		// : Add your own code. 
+	}
+	private Slot findSutiable(Packet p){
+	int voldiff [];
+	voldiff=new int [29];
+	int weightdiff[];
+	weightdiff= new int [29]; //TODO do we just want to create a final constant for the size so it can be changed?
+		for(int i=0; i<30; i++){
+			if (SP[i]==null && p.getWidth() <= SP[i].getWidth() && p.getHeight() <= SP[i].getHeight() && 
+					p.getDepth() <= SP[i].getDepth() && p.getWeight()<=SP[i].getLoadCapacity()){
+				int volsp=SP[i].getWidth()*SP[i].getHeight()*SP[i].getDepth();
+				int volp=p.getWidth()*p.getHeight()*p.getDepth();
+				voldiff[i]= volsp-volp;
+				weightdiff[i]=SP[i].getLoadCapacity()-p.getWeight();
+			
+				if(voldiff[i]==0 && weightdiff[i]==0){
+					slot=new Slot (SP[i].getNumber(), SP[i].getWidth(),SP[i].getHeight(), SP[i].getDepth(), 
+							SP[i].getPositionX(), SP[i].getPositionY(), SP[i].getLoadCapacity()  ) ;
+					break;
+					}
+				}
+			}
+		
+		int volmin= voldiff[0];
+		int weightmin= weightdiff[0];
+		for(int i=0; i<30; i++){
+			if (voldiff[i] <= volmin ||weightdiff[i]<weightmin){
+				slot=new Slot (SP[i].getNumber(), SP[i].getWidth(),SP[i].getHeight(), SP[i].getDepth(),
+						SP[i].getPositionX(), SP[i].getPositionY(), SP[i].getLoadCapacity()  ) ;
+				break;
+			}
+		}
+		return slot; // : Replace this with your own code. slot may have to be an array
+	}
+	
+	private Slot[] makeSlotArray(StoragePlace[] sp){
+		Slot slot[];
+		slot = new Slot[NUM_SLOTS];
+		for (int i = 0; i<=NUM_SLOTS;i++){
+			slot[i](SP[i].getNumber, SP[i].getWidth, SP[i].getHeight(), SP[i].getDepth(), 
+					SP[i].getPositionX(),SP[i].getPositionY(), SP[i].getLoadCapacity());
+			
+		}
+		
+		return slot[];
+	}
+}
