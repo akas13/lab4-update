@@ -1,0 +1,66 @@
+package de.tuhh.diss.harborstorage;
+
+import de.tuhh.diss.harborstorage.sim.StoragePlace;
+
+public class Slot implements StoragePlace {	
+	private int Number;
+	private int Width;
+	private int Height;
+	private int Depth;
+	private int PositionX;
+	private int PositionY;
+	private int LoadCapacity;
+	private double ContainPacket;
+	
+	public Slot (int num, int wi, int hi, int di, int xpo, int ypo, int lcap) {
+		Number=num;
+		Width=wi;
+		Height=hi;
+		Depth=di;
+		PositionX=xpo;
+		PositionY=ypo;
+		LoadCapacity=lcap;
+		
+	
+	}
+	
+	public int getNumber() {
+		int num=Number;
+		return num; //Replace this with your own code. 
+	}
+
+	public int getWidth() {
+		int wi=Width;
+		return wi; //Replace this with your own code. 
+	}
+
+	public int getHeight() {
+		int hi=Height;
+		return hi; //Replace this with your own code. 
+	}
+	
+	public int getDepth() {
+		int di=Depth;
+		return di; //Replace this with your own code. 
+	}
+	public int getLoadCapacity() {
+		int lcap=LoadCapacity;
+		return lcap; // Replace this with your own code. 
+	}
+	public int getPositionX() {
+		int xpo= PositionX;
+		return xpo; // Replace this with your own code. 
+	}
+	
+	public int getPositionY() {
+		int ypo=PositionY;
+		return ypo; // : Replace this with your own code. 
+	}
+	public double getContainPacket(){
+		double cp=ContainPacket;
+		return cp; //  Replace this with your own code.
+	}
+	public void setContainPacket(double cp){
+		ContainPacket=cp; // Replace this with your own code.
+	}
+}
