@@ -13,54 +13,54 @@ public class Slot implements StoragePlace {
 	private Packet ContainPacket;
 	
 	public Slot (int num, int wi, int hi, int di, int xpo, int ypo, int lcap) {
-		Number=num;
-		Width=wi;
-		Height=hi;
-		Depth=di;
-		PositionX=xpo;
-		PositionY=ypo;
-		LoadCapacity=lcap;
+		Number = num;
+		Width = wi;
+		Height = hi;
+		Depth = di;
+		PositionX = xpo;
+		PositionY = ypo;
+		LoadCapacity = lcap;
 		
 	
 	}
 	
 	public int getNumber() {
-		int num=Number;
+		int num = Number;
 		return num; //Replace this with your own code. 
 	}
 
 	public int getWidth() {
-		int wi=Width;
+		int wi = Width;
 		return wi; //Replace this with your own code. 
 	}
 
 	public int getHeight() {
-		int hi=Height;
+		int hi = Height;
 		return hi; //Replace this with your own code. 
 	}
 	
 	public int getDepth() {
-		int di=Depth;
+		int di = Depth;
 		return di; //Replace this with your own code. 
 	}
 	public int getLoadCapacity() {
-		int lcap=LoadCapacity;
+		int lcap = LoadCapacity;
 		return lcap; // Replace this with your own code. 
 	}
 	public int getPositionX() {
-		int xpo= PositionX;
+		int xpo = PositionX;
 		return xpo; // Replace this with your own code. 
 	}
 	
 	public int getPositionY() {
-		int ypo=PositionY;
+		int ypo = PositionY;
 		return ypo; // : Replace this with your own code. 
 	}
 	public Packet getContainPacket(){
-		Packet cp=ContainPacket;
-		return cp; //TODO:  Replace this with your own code.
+		Packet cp = ContainPacket;
+		return cp; //  Replace this with your own code.
 	}
 	public void setContainPacket(Packet cp){
-		ContainPacket=cp; // Replace this with your own code.
+		ContainPacket = cp; // Replace this with your own code.
 	}
 }
