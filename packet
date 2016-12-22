@@ -12,46 +12,51 @@ public class Packet implements StorageElement{
 	private double Location;
 	
 	public  Packet (int wi, int hi, int di, String des, int we){
-		Width=wi;
-		Height=hi;
-		Depth=di;
-		Weight=we;
-		Description=des;
+		Width = wi;
+		Height = hi;
+		Depth = di;
+		Weight = we;
+		Description = des;
 	}
 	
 	public int getWidth() {
-		int wi=Width;
+		int wi = Width;
 		return wi; //  Replace this with your own code. 
 	}
 
 	public int getHeight() {
-		int hi= Height;
+		int hi = Height;
 		return hi; // : Replace this with your own code. 
 	}
 
 	public int getDepth() {
-		int di= Depth;
+		int di = Depth;
 		return di; // : Replace this with your own code. 
 	}
 
 	public int getId() {
-		int id=ID;
+		int id = ID;
 		return id; // : Replace this with your own code. 
 	}
 	
+	public void setId(int id) {
+		ID = id;
+		 // : Replace this with your own code. 
+	}
+	
 	public String getDescription() {
-		String des=Description;
+		String des =Description;
 		return des; // : Replace this with your own code. 
 	}
 	public int getWeight() {
-		int we=Weight;
+		int we = Weight;
 		return we; // : Replace this with your own code. 
 	}
 	public double getLocation(){
-		double loc=Location;
+		double loc = Location;
 		return loc; // : Replace this with your own code.
 	}
 	public void setLocation(double loc){
-		Location=loc; // : Replace this with your own code. Does this need to be a void?
+		Location = loc; // : Replace this with your own code. Does this need to be a void?
 	}
 }
