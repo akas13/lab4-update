@@ -15,12 +15,11 @@ public class CraneControl  {
 		moveToX(x);
 		moveToY(y);
 		CR.storeElement();
-		x=CR.getLoadingPosX();
-		y=CR.getLoadingPosY();
+		x = CR.getLoadingPosX();
+		y = CR.getLoadingPosY();
 		moveToX(x);
 		moveToY(y);
-		shutdown();
-		// : Add your own code. TODO: review this pending our changes in HSM 12/19/16 
+		// : Add your own code. 
 	}
 	
 	public StorageElement retrievePacket(int x, int y) {
@@ -28,14 +27,13 @@ public class CraneControl  {
 		
 		moveToX(x);
 		moveToY(y);
-		packet=null;
+		packet = null;
 		CR.retrieveElement();
-		x=CR.getLoadingPosX();
-		y=CR.getLoadingPosY();
+		x = CR.getLoadingPosX();
+		y = CR.getLoadingPosY();
 		moveToX(x);
 		moveToY(y);
 		CR.unloadElement();
-		shutdown();
 		return packet; // : Replace this with your own code. 
 		// TODO How do we return packet without setting its value review this pending our changes in HSM 12/19/16 
 	}
@@ -44,36 +42,37 @@ public class CraneControl  {
 		CR.shutdown(); // : Add your own code. 
 	}
 	private int moveToX(int x) {
-		int posx=0;
-		posx=CR.getPositionX();
-		while (x!=posx){
-			if (posx<x){
+		int posx = 0;
+		posx = CR.getPositionX();
+		while (posx != x){
+			if (posx < x){
 				CR.forward();
-			posx=CR.getLoadingPosX();
+				CR.stopX();
+			posx = CR.getPositionX();				//Changed from getLoadingPosX, caused program to think posx wasnt moving
 			}
 			else if (posx>x){
 				CR.backward();
-			posx=CR.getLoadingPosX();
+				CR.stopX();
+			posx = CR.getPositionX();				//Changed from getLoadingPosX
 			}
-			//: if error, then add an else...combine Y for extra points?
 		}
-		CR.stopX();
 		return posx; // : Replace this with your own code.
 	}
 	private int moveToY(int y) {
-		int posy=0;
-		posy=CR.getPositionY();
-		while (y!=posy){
-			if (posy<y){
-				CR.forward();
-			posy=CR.getLoadingPosY();
+		int posy = 0;
+		posy = CR.getPositionY();
+		while (posy != y){
+			if (posy < y){
+				CR.up();							//Changed to up() since forward() only works for x
+				CR.stopY();
+				posy=CR.getPositionY();				//Changed from getLoadingPosY
 			}
-			else if (posy>y){
-				CR.backward();
-			posy=CR.getLoadingPosY();
+			else if (posy > y){
+				CR.down();							//Changed to down() since backward() only works for x
+				CR.stopY();
+				posy = CR.getPositionY();			//Changed from getLoadingPosY
 			}	
 		}
-		CR.stopY();
 		return posy; // : Replace this with your own code.
 	
 	}}
