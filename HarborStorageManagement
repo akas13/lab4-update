@@ -5,74 +5,96 @@ import de.tuhh.diss.harborstorage.sim.StorageException;
 import de.tuhh.diss.harborstorage.sim.PhysicalCrane;
 import de.tuhh.diss.harborstorage.sim.PhysicalHarborStorage;
 import de.tuhh.diss.harborstorage.sim.StoragePlace;
+import de.tuhh.diss.io.SimpleIO;
 
 
 
 public class HarborStorageManagement implements HighBayStorage {
+	
 	private CraneControl CC;
 	private Packet packet;
-	private Slot[] slot;// : do we have to create slot sizes/where do we put this?>no
+	private Slot[] slot;
 	private PhysicalCrane cr;
 	private PhysicalHarborStorage phs;
 	private StoragePlace[] SP;
 	private int numPacketStored;
-	public HarborStorageManagement (){
 	
-	cr=phs.getCrane();	
-	SP=phs.getStoragePlacesAsArray();
-	CC = new CraneControl(cr); // crane controler within the HSM constructor
-	numPacketStored =0;
+	public HarborStorageManagement (){
+	SimpleIO.print("Generating Harbor.\n");			//Just a check that the program is working
+	phs = new PhysicalHarborStorage();				//So phs actually gets made
+	cr = phs.getCrane();	
+	SP = phs.getStoragePlacesAsArray();
+	CC = new CraneControl(cr); 						// crane controller within the HSM constructor
+	numPacketStored = 0;
 	slot = makeSlotArray(slot); 
+	SimpleIO.print("Harbor made.\n");				//Another program operation check
 	}
 	
 	//final static public int NUM_SLOTS = 29;
 	
 	public int storePacket(int width, int height, int depth, String description, int weight) throws StorageException {
-		packet= new Packet( width,  height,  depth,  description,  weight);
+		SimpleIO.print("I'm working!!!!\n");		//Program operation check, POC for short here on out
+		packet = new Packet(width,  height,  depth,  description,  weight);
 		int sslot = findSutiable(packet);
-		int x=slot[sslot].getPositionX();
-		int y=slot[sslot].getPositionY();
+		int x = slot[sslot].getPositionX();
+		int y = slot[sslot].getPositionY();
+		SimpleIO.print(sslot + "\n");				//POC
+		SimpleIO.print(slot[sslot] + "\n");			//POC
+		SimpleIO.print(x + "\n");					//POC
+		SimpleIO.print(y + "\n");					//POC
 		CC.storePacket(x, y, packet);
 		numPacketStored++;
+		slot[sslot].setContainPacket(packet);		//So the slot in our array is filled
+		packet.setId( slot[sslot].getNumber()); 	//Assigns packets ID to the slot number
+		SimpleIO.print("Packet Stored\n");			//POC
 				return 0; // : Replace this with your own code. return 0 is there for the throws?
 	}
 	
 	public void retrievePacket(String description) throws StorageException {
+		SimpleIO.print("Retrieving Packet\n");		//POC
 		Packet[] packetArray;
-		
-		packetArray=getPackets();
-		int count=0;
-		String des = packetArray[count].getDescription();
-		if (des!=description){
-		while (packetArray[count]!=null || des!=description){
-			count++;
-			des = packetArray[count].getDescription();}
-		}
-		int id=packetArray[count].getId();
-		
-		int ID=0;
-		count=0;
-		if (id!=ID){
-			while (slot[count]!=null || id!=ID){
-				
-				count++;
-				id = slot[count].getNumber();}
+		packetArray = getPackets();
+		int p = -1;									//Used for the exception, and holding the position of the matching packet
+		for (int i = 0; i < packetArray.length; i++){
+			if ( packetArray[i].getDescription().compareTo(description) == 0){
+				p = i;								//This for loop runs through the length of the packetArray and sets p to i 
+				break;								//if it finds a matching description then breaks out.
 			}
-		int x = slot[count].getPositionX();
-		int y = slot[count].getPositionY();
+		}
+		if (p < 0){									//Used to throw the exception in case a a matching description is not found
+			//TODO: Add throw exception here
+			}
+		
+		int id = packetArray[p].getId();
+		int s = -1;									//Used for the exception, and holding the position of the matching slot
+		for (int i = 0; i < slot.length; i++){
+			if (slot[i].getNumber() == id){
+				s = i;								//This for loop runs through the length of slot and sets s to i 
+				break;								//if it finds a matching ID number then breaks out.
+			}
+		}
+		if (s < 0){									//Used to throw the exception in case a a matching ID number is not found
+			//TODO: Add throw exception here 	
+			}
+		int x = slot[s].getPositionX();
+		int y = slot[s].getPositionY();
 		
 		CC.retrievePacket(x,y);
+		slot[s].setContainPacket(null);				//So the slot in our array is emptied
+		packetArray[p].setId(0); 					//Assigns packets ID to the slot number
 		numPacketStored--;
+		SimpleIO.print("Packet Retrieved\n");		//POC
 		// : Add your own code. 
 	}
 	
 	public Packet[] getPackets() {
 		Packet[] packetArray;
 		int count = 0;
-		packetArray= new Packet [numPacketStored];
-		for(int i=0; i<=SP.length; i++){
-			if (slot[i].getContainPacket()!=null){
-				packetArray[count] = slot[i].getContainPacket(); //added (packet) cast, no idea what this does...
+		packetArray = new Packet [numPacketStored];
+		for(int i = 0; i < SP.length; i++){						//Changed <= to < so we dot exceed the array
+			if (slot[i].getContainPacket() != null){
+				packetArray[count] = slot[i].getContainPacket(); 
+				SimpleIO.print(packetArray[count].getDescription() + "\n");
 				count++;
 			}
 		}
@@ -86,50 +108,38 @@ public class HarborStorageManagement implements HighBayStorage {
 	}
 	private int findSutiable(Packet p){
 	int tempslot = 0;
-	double tsqdiff = 0;
-	//int tvoldiff;
-	//int tweidiff;
-	//voldiff=new int [29];
-	//int weightdiff[];
-	//weightdiff= new int [29]; //TODO do we just want to create a final constant for the size so it can be changed?
-		for(int i=0; i<=SP.length; i++){
-			if (slot[i].getContainPacket()==null && p.getWidth() <= slot[i].getWidth() && p.getHeight() <= slot[i].getHeight() && 
-					p.getDepth() <= slot[i].getDepth() && p.getWeight()<=slot[i].getLoadCapacity()){
-				int volsp=slot[i].getWidth()*slot[i].getHeight()*slot[i].getDepth();
-				int volp=p.getWidth()*p.getHeight()*p.getDepth();
-				int voldiff = volsp-volp;
-				int weightdiff=slot[i].getLoadCapacity()-p.getWeight();
-				double sqdiff = Math.sqrt(weightdiff*weightdiff + voldiff*voldiff);
+	double tsqdiff = 0; 
+	for(int i = 0; i < SP.length; i++){				//Changed <= to < so we dot exceed the array
+		if (slot[i].getContainPacket() == null && 
+			p.getWidth() <= slot[i].getWidth() && 
+			p.getHeight() <= slot[i].getHeight() && 
+			p.getDepth() <= slot[i].getDepth() && 
+			p.getWeight() <= slot[i].getLoadCapacity()){
 			
-				if(voldiff==0 && weightdiff==0){
+				int volsp = slot[i].getWidth() * slot[i].getHeight() * slot[i].getDepth();
+				int volp = p.getWidth() * p.getHeight() * p.getDepth();
+				int voldiff = volsp - volp;
+				int weightdiff = slot[i].getLoadCapacity() - p.getWeight();
+				double sqdiff = Math.sqrt(weightdiff * weightdiff + voldiff * voldiff);
+				 if(voldiff == 0 && weightdiff == 0){
 					tempslot = i;
 					break;
 					} else if(tempslot == 0){
 						tempslot = i;
 						tsqdiff = sqdiff;
-					} else if(tempslot>0 && sqdiff<tsqdiff){
+					} else if(tempslot > 0 && sqdiff < tsqdiff){
 						tempslot = i;
 						tsqdiff = sqdiff;
 					}
 				}
-			}
-		
-		/*int volmin= voldiff[0];
-		int weightmin= weightdiff[0];
-		for(int i=0; i<30; i++){
-			if (voldiff[i] <= volmin ||weightdiff[i]<weightmin){
-				slot[]=new Slot (SP[i].getNumber(), SP[i].getWidth(),SP[i].getHeight(), SP[i].getDepth(),
-						SP[i].getPositionX(), SP[i].getPositionY(), SP[i].getLoadCapacity()  ) ;
-				break;
-			}
-		}*/
+		}
 		return tempslot; // : Replace this with your own code.
 	}
 	
 	private Slot[] makeSlotArray(Slot[] s){
 		s = new Slot[SP.length];
-		for (int i = 0; i<=SP.length;i++){
-			s[i]=new Slot(SP[i].getNumber(), SP[i].getWidth(), SP[i].getHeight(), SP[i].getDepth(), 
+		for (int i = 0; i < SP.length; i++){ 				//Changed <= to < so we dot exceed the array
+			s[i] = new Slot(SP[i].getNumber(), SP[i].getWidth(), SP[i].getHeight(), SP[i].getDepth(), 
 					SP[i].getPositionX(),SP[i].getPositionY(), SP[i].getLoadCapacity()); //use this to call the slots out in the find sutiable initialize get packet with null
 			s[i].setContainPacket(null);
 	
@@ -137,4 +147,5 @@ public class HarborStorageManagement implements HighBayStorage {
 	
 		return s;
 	}
-}
+		
+	}
