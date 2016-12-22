@@ -4,33 +4,53 @@ import de.tuhh.diss.harborstorage.sim.StorageException;
 import de.tuhh.diss.io.SimpleIO;
 
 public class HarborStorageApp {
+	
 	private static HarborStorageManagement HSM;
-	private void showAvaliblePackets() {
+	//private Packet[] packetArray;
+	
+	private static void showAvaliblePackets() {			//This method creates an array of the stored packets and prints the information, but only if there are items in it
+		Packet[] packetArray;
+		packetArray = HSM.getPackets();
+		if(packetArray.length != 0){
+			SimpleIO.print("\nAvailable packets:\n");
+			int num = 1;
+			for (int i = 0; i < packetArray.length; i++){
+			SimpleIO.print(num + ": Packet '" + packetArray[i].getDescription() + "' Size: " + packetArray[i].getWidth() + "x" + packetArray[i].getHeight()
+				+ "x"  + packetArray[i].getDepth() + " Weight: " + packetArray[i].getWeight() + "\n");
+			num++;
+			
+			}
+		}
 		
-		
-		// TODO: Replace this with your own code. Call the shutdown. Add method call to harbor storage management
+		// Replace this with your own code. Call the shutdown. Add method call to harbor storage management
 	}
 	public static void main (String[] args)  {
+	HSM = new HarborStorageManagement();				// This way HSM actually gets created, and program will run
+	
 	int selection;
 		do{
-		SimpleIO.print("please make a selection 1=store,2=retrive,3=quit");
+		showAvaliblePackets();							//Calls the showAvalibleMethod so it happens before the Main Menu every time
+		SimpleIO.print("\n\n*** Main Menu ***\n");
+		SimpleIO.print("1) Store a Packet\n");
+		SimpleIO.print("2) Retrieve a packet\n");
+		SimpleIO.print("3) Quit\n");
 		selection=SimpleIO.readInt();
 		switch (selection){
 		case 1:
-			SimpleIO.print("please give a description");
-			String description=SimpleIO.readString();
+			SimpleIO.print("Please give a description\n");
+			String description = SimpleIO.readString();
 			
-			SimpleIO.print("please give the width of the packet");
-			int wi=SimpleIO.readInt();
+			SimpleIO.print("Please give the width of the packet\n");
+			int wi = SimpleIO.readInt();
 			
-			SimpleIO.print("please give the height of the packet");
-			int hi=SimpleIO.readInt();
+			SimpleIO.print("Please give the height of the packet\n");
+			int hi = SimpleIO.readInt();
 			
-			SimpleIO.print("please give the depth of the packet");
-			int de=SimpleIO.readInt();
+			SimpleIO.print("Please give the depth of the packet\n");
+			int de = SimpleIO.readInt();
 			
-			SimpleIO.print("please give the weight of the packet");
-			int we=SimpleIO.readInt();
+			SimpleIO.print("Please give the weight of the packet\n");
+			int we = SimpleIO.readInt();
 			
 			try {
 				HSM.storePacket(wi, hi, de, description, we);
@@ -42,8 +62,8 @@ public class HarborStorageApp {
 			break;
 			
 		case 2:
-			SimpleIO.print("please give a description");
-			String description1=SimpleIO.readString();
+			SimpleIO.print("Please give a description\n");
+			String description1 = SimpleIO.readString();
 			try {
 				HSM.retrievePacket(description1);
 			} catch (StorageException e) {
@@ -54,13 +74,13 @@ public class HarborStorageApp {
 			break;
 			
 		case 3:
-			SimpleIO.print("Goodbye");
+			SimpleIO.print("Goodbye\n");
 			
 			break;
 		
 		}
 		
-		}while(selection!=3);
+		}while(selection != 3);
+		HSM.shutdown();					//Misinterpreted the instructions, this is the only time the shutdown method should be called
 	}
 }
-
