@@ -21,9 +21,25 @@ public class HarborStorageApp {
 			
 			}
 		}
-		
-		// Replace this with your own code. Call the shutdown. Add method call to harbor storage management
 	}
+	
+	private static int realityCheck(){					//This method makes sure the numbers entered are greater than 0
+		boolean Real = false;
+		int num = SimpleIO.readInt();
+		while (Real == false){
+			if (num > 0)
+				Real = true;
+			else {
+				SimpleIO.print("I'm sorry, the number you entered is not realistic.\n");
+				SimpleIO.print("Please enter a number greater than 0.\n");
+				num = SimpleIO.readInt();
+			}
+		}
+		return num;
+	}
+	
+	
+	
 	public static void main (String[] args)  {
 	HSM = new HarborStorageManagement();				// This way HSM actually gets created, and program will run
 	
@@ -41,21 +57,20 @@ public class HarborStorageApp {
 			String description = SimpleIO.readString();
 			
 			SimpleIO.print("Please give the width of the packet\n");
-			int wi = SimpleIO.readInt();
+			int wi = realityCheck();
 			
 			SimpleIO.print("Please give the height of the packet\n");
-			int hi = SimpleIO.readInt();
+			int hi = realityCheck();
 			
 			SimpleIO.print("Please give the depth of the packet\n");
-			int de = SimpleIO.readInt();
+			int de = realityCheck();
 			
 			SimpleIO.print("Please give the weight of the packet\n");
-			int we = SimpleIO.readInt();
+			int we = realityCheck();
 			
 			try {
 				HSM.storePacket(wi, hi, de, description, we);
 			} catch (StorageException e) {
-				// TODO Auto-generated catch block add warnings in other classes, print errors here
 				e.printStackTrace();
 			}
 			
@@ -67,7 +82,6 @@ public class HarborStorageApp {
 			try {
 				HSM.retrievePacket(description1);
 			} catch (StorageException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
