@@ -10,48 +10,55 @@ public class Packet implements StorageElement{
 	private String Description;
 	private int ID;
 	private double Location;
-	
+	//the private variables are created needed to define the packet along with the class packet using the storage element class
 	public  Packet (int wi, int hi, int di, String des, int we){
-		Width=wi;
-		Height=hi;
-		Depth=di;
-		Weight=we;
-		Description=des;
+		Width = wi;
+		Height = hi;
+		Depth = di;
+		Weight = we;
+		Description = des;
 	}
-	
+	//here the variables from storage element class are tied to variables in packet class
 	public int getWidth() {
-		int wi=Width;
-		return wi; //  Replace this with your own code. 
+		int wi = Width;
+		return wi; //in each of these cases, methods are created for the packet class depending on which variables are needed. "own code" is
+		//left to show were we edited code vs. what was supplied to us at the beginning of the lab. in most cases, the method returns the var
+		// with the exception of the set location method . 
 	}
 
 	public int getHeight() {
-		int hi= Height;
-		return hi; // : Replace this with your own code. 
+		int hi = Height;
+		return hi; // own code 
 	}
 
 	public int getDepth() {
-		int di= Depth;
-		return di; // : Replace this with your own code. 
+		int di = Depth;
+		return di; // own code 
 	}
 
 	public int getId() {
-		int id=ID;
-		return id; // : Replace this with your own code. 
+		int id = ID;
+		return id; // own code
+	}
+	
+	public void setId(int id) {
+		ID = id;
+		 // own code 
 	}
 	
 	public String getDescription() {
-		String des=Description;
-		return des; // : Replace this with your own code. 
+		String des =Description;
+		return des; //own code
 	}
 	public int getWeight() {
-		int we=Weight;
-		return we; // : Replace this with your own code. 
+		int we = Weight;
+		return we; // own code 
 	}
 	public double getLocation(){
-		double loc=Location;
-		return loc; // : Replace this with your own code.
+		double loc = Location;
+		return loc; // own code
 	}
 	public void setLocation(double loc){
-		Location=loc; // : Replace this with your own code. Does this need to be a void?
+		Location = loc; // own code
 	}
 }
