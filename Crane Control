@@ -1,27 +1,31 @@
-
 package de.tuhh.diss.harborstorage;
 
 import de.tuhh.diss.harborstorage.sim.PhysicalCrane;
 import de.tuhh.diss.harborstorage.sim.StorageElement;
-
+//Class Summary: in the crane control class we call the physical crane and we define the methods for storing and retrieving packets 
+// Class Summary Continued:as well as shutdown movement in the x and y directions.
 
 public class CraneControl  {
 	private PhysicalCrane CR;
 	public CraneControl (PhysicalCrane cr){
 		CR = cr;
-		// what to set cr to in the constructor
+		//we create the class crane control and call the class of physical crane and initialize it with a variable named 
+		//CR so it can be used in the crane control class
 	}
 	public void storePacket(int x, int y, StorageElement packet) {
 		CR.loadElement(packet);
 		moveToX(x);
 		moveToY(y);
 		CR.storeElement();
-		x=CR.getLoadingPosX();
-		y=CR.getLoadingPosY();
+		x = CR.getLoadingPosX();
+		y = CR.getLoadingPosY();
 		moveToX(x);
 		moveToY(y);
-		shutdown();
-		// : Add your own code. 
+		
+		//Method Summary: store packet method is created, the expected inputs to the method are x location, y location and packet from the 
+		//Method Summary Continued: class StorageElement the physical crane class is called into action using a method to load the packet 
+		//Method Summary Continued:then the packet is moved to the predetermined x,y coordinates and calls the store element method. finally 
+		//Method Summary Continued: the CR moves back to the loading position.
 	}
 	
 	public StorageElement retrievePacket(int x, int y) {
@@ -29,52 +33,62 @@ public class CraneControl  {
 		
 		moveToX(x);
 		moveToY(y);
-		packet=null;
+		packet = null;
 		CR.retrieveElement();
-		x=CR.getLoadingPosX();
-		y=CR.getLoadingPosY();
+		x = CR.getLoadingPosX();
+		y = CR.getLoadingPosY();
 		moveToX(x);
 		moveToY(y);
 		CR.unloadElement();
-		shutdown();
-		return packet; // : Replace this with your own code. 
-		// TODO How do we return packet without setting its value
+		return packet; 
+		//Method Summary: the retrieve packet method is created, the expected inputs are the x and y location. the expected return is the 
+		//Method Summary Continued: packet. given an x and y location, the retrive element method is called from physical crane, the packet
+		//Method Summary Continued: is obtained and moved back to the loading/unloading position where the packet is unloaded using the method 
+		//Method Summary Continued: using the method fromt the physical crane, unloadElement. the packet is returned to the method.
 	}
 	
 	public void shutdown() {
-		CR.shutdown(); // : Add your own code. 
-	}
+		CR.shutdown(); 
+		//Method Summary:the shutdown method is created and will shutdown the physical crane when called
+		
+		}
 	private int moveToX(int x) {
-		int posx=0;
-		posx=CR.getPositionX();
-		while (x!=posx){
-			if (posx<x){
+		int posx = 0;
+		posx = CR.getPositionX();
+		while (posx != x){
+			if (posx < x){
 				CR.forward();
-			posx=CR.getLoadingPosX();
+				CR.stopX();
+			posx = CR.getPositionX();				//Changed from getLoadingPosX, caused program to think posx wasnt moving
 			}
 			else if (posx>x){
 				CR.backward();
-			posx=CR.getLoadingPosX();
+				CR.stopX();
+			posx = CR.getPositionX();				//Changed from getLoadingPosX
 			}
-			//: if error, then add an else...combine Y for extra points?
 		}
-		CR.stopX();
-		return posx; // : Replace this with your own code.
+		return posx;
+		//Method Summary: this method logic contains movement in the x direction it uses a while loop to say while the distance is positive  
+		//Method Summary Continued: between the current location and the packet location, move forward, otherwise move in reverse. allowing the  
+		//Method Summary Continued: physical crane to not care where it starts but monitor the position relative to the packet
 	}
 	private int moveToY(int y) {
-		int posy=0;
-		posy=CR.getPositionY();
-		while (y!=posy){
-			if (posy<y){
-				CR.forward();
-			posy=CR.getLoadingPosY();
+		int posy = 0;
+		posy = CR.getPositionY();
+		while (posy != y){
+			if (posy < y){
+				CR.up();							//Changed to up() since forward() only works for x
+				CR.stopY();
+				posy=CR.getPositionY();				//Changed from getLoadingPosY
 			}
-			else if (posy>y){
-				CR.backward();
-			posy=CR.getLoadingPosY();
+			else if (posy > y){
+				CR.down();							//Changed to down() since backward() only works for x
+				CR.stopY();
+				posy = CR.getPositionY();			//Changed from getLoadingPosY
 			}	
 		}
-		CR.stopY();
-		return posy; // : Replace this with your own code.
+		return posy; 
+		//Method Summary: same description as the moveToX method above.
+		
 	
 	}}
