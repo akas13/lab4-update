@@ -10,57 +10,60 @@ public class Slot implements StoragePlace {
 	private int PositionX;
 	private int PositionY;
 	private int LoadCapacity;
-	private double ContainPacket;
+	private Packet ContainPacket;
+	//the private variables are created needed to define the slot along with the class slot using the storage place class
 	
 	public Slot (int num, int wi, int hi, int di, int xpo, int ypo, int lcap) {
-		Number=num;
-		Width=wi;
-		Height=hi;
-		Depth=di;
-		PositionX=xpo;
-		PositionY=ypo;
-		LoadCapacity=lcap;
-		
+		Number = num;
+		Width = wi;
+		Height = hi;
+		Depth = di;
+		PositionX = xpo;
+		PositionY = ypo;
+		LoadCapacity = lcap;
+		//here the variables from storage place class are tied to variables in slot class
 	
 	}
 	
 	public int getNumber() {
-		int num=Number;
-		return num; //Replace this with your own code. 
+		int num = Number;
+		return num; //in each of these cases, methods are created for the slot class depending on which variables are needed. "own code" is
+		//left to show were we edited code vs. what was supplied to us at the beginning of the lab. in most cases, the method returns the var
+		// with the exception of contain packet.
 	}
 
 	public int getWidth() {
-		int wi=Width;
-		return wi; //Replace this with your own code. 
+		int wi = Width;
+		return wi; // own code
 	}
 
 	public int getHeight() {
-		int hi=Height;
-		return hi; //Replace this with your own code. 
+		int hi = Height;
+		return hi; //own code 
 	}
 	
 	public int getDepth() {
-		int di=Depth;
-		return di; //Replace this with your own code. 
+		int di = Depth;
+		return di; //own code 
 	}
 	public int getLoadCapacity() {
-		int lcap=LoadCapacity;
-		return lcap; // Replace this with your own code. 
+		int lcap = LoadCapacity;
+		return lcap; //own code 
 	}
 	public int getPositionX() {
-		int xpo= PositionX;
-		return xpo; // Replace this with your own code. 
+		int xpo = PositionX;
+		return xpo; //own code 
 	}
 	
 	public int getPositionY() {
-		int ypo=PositionY;
-		return ypo; // : Replace this with your own code. 
+		int ypo = PositionY;
+		return ypo; //own code 
 	}
-	public double getContainPacket(){
-		double cp=ContainPacket;
-		return cp; //  Replace this with your own code.
+	public Packet getContainPacket(){
+		Packet cp = ContainPacket;
+		return cp; //own code
 	}
-	public void setContainPacket(double cp){
-		ContainPacket=cp; // Replace this with your own code.
+	public void setContainPacket(Packet cp){
+		ContainPacket = cp; //own code
 	}
 }
