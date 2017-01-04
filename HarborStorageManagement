@@ -19,6 +19,7 @@ public class HarborStorageManagement implements HighBayStorage {
 	private StoragePlace[] SP;
 	private int numPacketStored;
 	private int exception;							//Used to eliminate "magic number"
+	//here the variables and classes needed in the HSM class are called
 	
 	public HarborStorageManagement (){
 	SimpleIO.print("Generating Harbor.\n");			//Just a check that the program is working
@@ -61,7 +62,7 @@ public class HarborStorageManagement implements HighBayStorage {
 		return 0; // : Replace this with your own code. return 0 is there for the throws?
 	}
 	
-	public void retrievePacket(String description) throws StorageException {
+	public void retrievePacket(String description) throws StorageException { //this method searches the array for the requested packet
 		SimpleIO.print("Retrieving Packet\n");				//POC
 		Packet[] packetArray;
 		packetArray = getPackets();
@@ -105,7 +106,7 @@ public class HarborStorageManagement implements HighBayStorage {
 		
 	}
 	
-	public Packet[] getPackets() {
+	public Packet[] getPackets() {//this method shows what is currently stored in the storage array
 		Packet[] packetArray;
 		int count = 0;
 		packetArray = new Packet [numPacketStored];
@@ -122,8 +123,10 @@ public class HarborStorageManagement implements HighBayStorage {
 	
 	public void shutdown() {
 		CC.shutdown();
+		// : this method calls the shutdown method of the crane control
 	}
 	private int findSutiable(Packet p){
+	//This method searches for a suitable slot, goes through each position and checks slots against the requirements of the packet. once it finds suitable options, it finds the best fit depending on which is closest
 	int tempslot = exception;						//Got rid of "magic number" for constant "exception"
 	double tsqdiff = 0; 
 	for(int i = 0; i < SP.length; i++){				//Changed <= to < so we dont exceed the array
