@@ -29,25 +29,29 @@ public class HarborStorageManagement implements HighBayStorage {
 	numPacketStored = 0;
 	slot = makeSlotArray(slot); 
 	exception = -1;									//Used for throwing exceptions later
+	int num = 1;
+	for (int i = 0; i < slot.length; i++){
+	SimpleIO.print(num + ": Number '" + slot[i].getNumber() + "' Size: " + slot[i].getWidth() + "x" + slot[i].getHeight()
+		+ "x"  + slot[i].getDepth() + " Load Capacity: " + slot[i].getLoadCapacity() + "\n");
+	num++;
+	
+	}
 	SimpleIO.print("Harbor made.\n");				//Another program operation check
 	}
-	
-	//final static public int NUM_SLOTS = 29;
 	
 	public int storePacket(int width, int height, int depth, String description, int weight) throws StorageException {
 		SimpleIO.print("I'm working!!!!\n");			//Program operation check, POC for short here on out
 		packet = new Packet(width,  height,  depth,  description,  weight);
 		int sslot = findSutiable(packet);
-		SimpleIO.print(sslot);
 		if (sslot == exception){						//Checking for the Exception 
-			throw new StorageException("Unable to find suitable slot.");
+			throw new StorageException("Unable to find a suitable slot.");
 		} else {
 			int x = slot[sslot].getPositionX();
 			int y = slot[sslot].getPositionY();
-			SimpleIO.print(sslot + "\n");				//POC
-			SimpleIO.print(slot[sslot] + "\n");			//POC
-			SimpleIO.print(x + "\n");					//POC
-			SimpleIO.print(y + "\n");					//POC
+			//SimpleIO.print(sslot + "\n");				//POC
+			//SimpleIO.print(slot[sslot] + "\n");		//POC
+			//SimpleIO.print(x + "\n");					//POC
+			//SimpleIO.print(y + "\n");					//POC
 			CC.storePacket(x, y, packet);
 			numPacketStored++;
 			slot[sslot].setContainPacket(packet);		//So the slot in our array is filled
@@ -94,7 +98,6 @@ public class HarborStorageManagement implements HighBayStorage {
 				packetArray[p].setId(0); 					//Assigns packets ID to the slot number
 				numPacketStored--;
 				SimpleIO.print("Packet Retrieved\n");		//POC
-				// : Add your own code. 
 			}
 			
 		}
@@ -106,7 +109,7 @@ public class HarborStorageManagement implements HighBayStorage {
 		Packet[] packetArray;
 		int count = 0;
 		packetArray = new Packet [numPacketStored];
-		for(int i = 0; i < SP.length; i++){						//Changed <= to < so we dot exceed the array
+		for(int i = 0; i < SP.length; i++){						//Changed <= to < so we dont exceed the array
 			if (slot[i].getContainPacket() != null){
 				packetArray[count] = slot[i].getContainPacket(); 
 				SimpleIO.print(packetArray[count].getDescription() + "\n");
@@ -114,17 +117,16 @@ public class HarborStorageManagement implements HighBayStorage {
 			}
 		}
 		
-		return packetArray; // : Replace this with your own code. 
+		return packetArray;
 	}
 	
 	public void shutdown() {
 		CC.shutdown();
-		// : Add your own code. 
 	}
 	private int findSutiable(Packet p){
 	int tempslot = exception;						//Got rid of "magic number" for constant "exception"
 	double tsqdiff = 0; 
-	for(int i = 0; i < SP.length; i++){				//Changed <= to < so we dot exceed the array
+	for(int i = 0; i < SP.length; i++){				//Changed <= to < so we dont exceed the array
 		if (slot[i].getContainPacket() == null && 
 			p.getWidth() <= slot[i].getWidth() && 
 			p.getHeight() <= slot[i].getHeight() && 
@@ -135,27 +137,27 @@ public class HarborStorageManagement implements HighBayStorage {
 				int volp = p.getWidth() * p.getHeight() * p.getDepth();
 				int voldiff = volsp - volp;
 				int weightdiff = slot[i].getLoadCapacity() - p.getWeight();
-				double sqdiff = Math.sqrt(weightdiff * weightdiff + voldiff * voldiff);
+				double sqdiff = Math.sqrt(Math.pow(weightdiff, 2) + Math.pow(voldiff, 2));
 				 if(voldiff == 0 && weightdiff == 0){
 					tempslot = i;
 					break;
 					} else if(tempslot == exception){
 						tempslot = i;
 						tsqdiff = sqdiff;
-					} else if(tempslot > 0 && sqdiff < tsqdiff){
+					} else if(tempslot > exception && sqdiff < tsqdiff){
 						tempslot = i;
 						tsqdiff = sqdiff;
 					}
 				}
 		}
-		return tempslot; // : Replace this with your own code.
+		return tempslot;
 	}
 	
 	private Slot[] makeSlotArray(Slot[] s){
 		s = new Slot[SP.length];
-		for (int i = 0; i < SP.length; i++){ 				//Changed <= to < so we dot exceed the array
+		for (int i = 0; i < SP.length; i++){ 				//Changed <= to < so we dont exceed the array
 			s[i] = new Slot(SP[i].getNumber(), SP[i].getWidth(), SP[i].getHeight(), SP[i].getDepth(), 
-					SP[i].getPositionX(),SP[i].getPositionY(), SP[i].getLoadCapacity()); //use this to call the slots out in the find sutiable initialize get packet with null
+					SP[i].getPositionX(),SP[i].getPositionY(), SP[i].getLoadCapacity()); //use this to call the slots out in the find suitable initialize get packet with null
 			s[i].setContainPacket(null);
 	
 		}
@@ -164,5 +166,3 @@ public class HarborStorageManagement implements HighBayStorage {
 	}
 		
 	}
-	
-	
