@@ -1,94 +1,171 @@
 package de.tuhh.diss.harborstorage;
 
+import de.tuhh.diss.harborstorage.sim.HighBayStorage;
+import de.tuhh.diss.harborstorage.sim.StorageException;
 import de.tuhh.diss.harborstorage.sim.PhysicalCrane;
-import de.tuhh.diss.harborstorage.sim.StorageElement;
-//Class Summary: in the crane control class we call the physical crane and we define the methods for storing and retrieving packets 
-// Class Summary Continued:as well as shutdown movement in the x and y directions.
+import de.tuhh.diss.harborstorage.sim.PhysicalHarborStorage;
+import de.tuhh.diss.harborstorage.sim.StoragePlace;
+import de.tuhh.diss.io.SimpleIO;
 
-public class CraneControl  {
-	private PhysicalCrane CR;
-	public CraneControl (PhysicalCrane cr){
-		CR = cr;
-		//we create the class crane control and call the class of physical crane and initialize it with a variable named 
-		//CR so it can be used in the crane control class
-	}
-	public void storePacket(int x, int y, StorageElement packet) {
-		CR.loadElement(packet);
-		moveToX(x);
-		moveToY(y);
-		CR.storeElement();
-		x = CR.getLoadingPosX();
-		y = CR.getLoadingPosY();
-		moveToX(x);
-		moveToY(y);
-		
-		//Method Summary: store packet method is created, the expected inputs to the method are x location, y location and packet from the 
-		//Method Summary Continued: class StorageElement the physical crane class is called into action using a method to load the packet 
-		//Method Summary Continued:then the packet is moved to the predetermined x,y coordinates and calls the store element method. finally 
-		//Method Summary Continued: the CR moves back to the loading position.
+
+
+public class HarborStorageManagement implements HighBayStorage {
+	
+	private CraneControl CC;
+	private Packet packet;
+	private Slot[] slot;
+	private PhysicalCrane cr;
+	private PhysicalHarborStorage phs;
+	private StoragePlace[] SP;
+	private int numPacketStored;
+	private int exception;							//Used to eliminate "magic number"
+	
+	//here the variables and classes needed in the HSM class are called
+	
+	public HarborStorageManagement (){
+	SimpleIO.print("Generating Harbor.\n");			//Just a check that the program is working
+	phs = new PhysicalHarborStorage();				//So phs actually gets made
+	cr = phs.getCrane();	
+	SP = phs.getStoragePlacesAsArray();
+	CC = new CraneControl(cr); 						//crane controller within the HSM constructor
+	numPacketStored = 0;
+	slot = makeSlotArray(slot); 
+	exception = -1;									//Used for throwing exceptions later
+	SimpleIO.print("Harbor made.\n");				//Another program operation check
 	}
 	
-	public StorageElement retrievePacket(int x, int y) {
-		Packet packet;
+	//final static public int NUM_SLOTS = 29; commented out
+	
+	public int storePacket(int width, int height, int depth, String description, int weight) throws StorageException {
+		SimpleIO.print("I'm working!!!!\n");			//Program operation check, POC for short here on out
+		packet = new Packet(width,  height,  depth,  description,  weight);
+		int sslot = findSutiable(packet);
+		SimpleIO.print(sslot);
+		if (sslot == exception){						//Checking for the Exception 
+			throw new StorageException("Unable to find suitable slot.");
+		} else {
+			int x = slot[sslot].getPositionX();
+			int y = slot[sslot].getPositionY();
+			SimpleIO.print(sslot + "\n");				//POC
+			SimpleIO.print(slot[sslot] + "\n");			//POC
+			SimpleIO.print(x + "\n");					//POC
+			SimpleIO.print(y + "\n");					//POC
+			CC.storePacket(x, y, packet);
+			numPacketStored++;
+			slot[sslot].setContainPacket(packet);		//So the slot in our array is filled
+			packet.setId( slot[sslot].getNumber()); 	//Assigns packets ID to the slot number
+			SimpleIO.print("Packet Stored\n");			//POC
+		}
+		return 0; // TODO: Replace this with your own code. return 0 is there for the throws?
+	}
+	
+	public void retrievePacket(String description) throws StorageException { //this method searches the array for the requested packet
+		SimpleIO.print("Retrieving Packet\n");				//POC
+		Packet[] packetArray;
+		packetArray = getPackets();
+		int p = exception;									//Used for the exception, and holding the position of the matching packet. 
+															//Later edit: got rid of "magic number" for constant "exception"
+		for (int i = 0; i < packetArray.length; i++){
+			if ( packetArray[i].getDescription().compareTo(description) == 0){
+				p = i;										//This for loop runs through the length of the packetArray and sets p to i 
+				break;										//if it finds a matching description then breaks out.
+			}
+		}
+		if (p == exception)									//Used to throw the exception in case a a matching description is not found
+															//Later edit: got rid of "magic number" for constant "exception"
+			throw new StorageException("A packet with that description was not found.");
+		else{
+			int id = packetArray[p].getId();
+			int s = exception;								//Used for the exception, and holding the position of the matching slot
+															//Later edit: got rid of "magic number" for constant "exception"
+			for (int i = 0; i < slot.length; i++){
+				if (slot[i].getNumber() == id){
+					s = i;									//This for loop runs through the length of slot and sets s to i 
+					break;									//if it finds a matching ID number then breaks out.
+				}
+			}
+			if (s == exception)								//Used to throw the exception in case a a matching ID number is not found
+															//Later edit: got rid of "magic number" for constant "exception"
+				throw new StorageException("An error has occured, the packet was found but the slot was not.");	
+			else {
+				int x = slot[s].getPositionX();
+				int y = slot[s].getPositionY();
+				
+				CC.retrievePacket(x,y);
+				slot[s].setContainPacket(null);				//So the slot in our array is emptied
+				packetArray[p].setId(0); 					//Assigns packets ID to the slot number
+				numPacketStored--;
+				SimpleIO.print("Packet Retrieved\n");		//POC
+				
+			}
+			
+		}
 		
-		moveToX(x);
-		moveToY(y);
-		packet = null;
-		CR.retrieveElement();
-		x = CR.getLoadingPosX();
-		y = CR.getLoadingPosY();
-		moveToX(x);
-		moveToY(y);
-		CR.unloadElement();
-		return packet; 
-		//Method Summary: the retrieve packet method is created, the expected inputs are the x and y location. the expected return is the 
-		//Method Summary Continued: packet. given an x and y location, the retrive element method is called from physical crane, the packet
-		//Method Summary Continued: is obtained and moved back to the loading/unloading position where the packet is unloaded using the method 
-		//Method Summary Continued: using the method fromt the physical crane, unloadElement. the packet is returned to the method.
+		
+	}
+	
+	public Packet[] getPackets() {//this method shows what is currently stored in the storage array
+		Packet[] packetArray;
+		int count = 0;
+		packetArray = new Packet [numPacketStored];
+		for(int i = 0; i < SP.length; i++){						//Changed <= to < so we dot exceed the array
+			if (slot[i].getContainPacket() != null){
+				packetArray[count] = slot[i].getContainPacket(); 
+				SimpleIO.print(packetArray[count].getDescription() + "\n");
+				count++;
+			}
+		}
+		
+		return packetArray; 
 	}
 	
 	public void shutdown() {
-		CR.shutdown(); 
-		//Method Summary:the shutdown method is created and will shutdown the physical crane when called
-		
-		}
-	private int moveToX(int x) {
-		int posx = 0;
-		posx = CR.getPositionX();
-		while (posx != x){
-			if (posx < x){
-				CR.forward();
-				CR.stopX();
-			posx = CR.getPositionX();				//Changed from getLoadingPosX, caused program to think posx wasnt moving
-			}
-			else if (posx>x){
-				CR.backward();
-				CR.stopX();
-			posx = CR.getPositionX();				//Changed from getLoadingPosX
-			}
-		}
-		return posx;
-		//Method Summary: this method logic contains movement in the x direction it uses a while loop to say while the distance is positive  
-		//Method Summary Continued: between the current location and the packet location, move forward, otherwise move in reverse. allowing the  
-		//Method Summary Continued: physical crane to not care where it starts but monitor the position relative to the packet
+		CC.shutdown();
+		// : this method calls the shutdown method of the crane control
 	}
-	private int moveToY(int y) {
-		int posy = 0;
-		posy = CR.getPositionY();
-		while (posy != y){
-			if (posy < y){
-				CR.up();							//Changed to up() since forward() only works for x
-				CR.stopY();
-				posy=CR.getPositionY();				//Changed from getLoadingPosY
-			}
-			else if (posy > y){
-				CR.down();							//Changed to down() since backward() only works for x
-				CR.stopY();
-				posy = CR.getPositionY();			//Changed from getLoadingPosY
-			}	
+	private int findSutiable(Packet p){ 
+	int tempslot = exception;						//Got rid of "magic number" for constant "exception"
+	double tsqdiff = 0; 
+	for(int i = 0; i < SP.length; i++){				//Changed <= to < so we dont exceed the array
+		if (slot[i].getContainPacket() == null && 
+			p.getWidth() <= slot[i].getWidth() && 
+			p.getHeight() <= slot[i].getHeight() && 
+			p.getDepth() <= slot[i].getDepth() && 
+			p.getWeight() <= slot[i].getLoadCapacity()){
+			
+				int volsp = slot[i].getWidth() * slot[i].getHeight() * slot[i].getDepth();
+				int volp = p.getWidth() * p.getHeight() * p.getDepth();
+				int voldiff = volsp - volp;
+				int weightdiff = slot[i].getLoadCapacity() - p.getWeight();
+				double sqdiff = Math.sqrt(weightdiff * weightdiff + voldiff * voldiff);
+				 if(voldiff == 0 && weightdiff == 0){
+					tempslot = i;
+					break;
+					} else if(tempslot == exception){
+						tempslot = i;
+						tsqdiff = sqdiff;
+					} else if(tempslot > 0 && sqdiff < tsqdiff){
+						tempslot = i;
+						tsqdiff = sqdiff;
+					}
+				}
 		}
-		return posy; 
-		//Method Summary: same description as the moveToX method above.
-		
+		return tempslot; 
+//This method searches for a suitable slot, goes through each position and checks slots against the requirements of the packet. once it finds suitable options, it finds the best fit depending on which is closest
+	}
 	
-	}}
+	private Slot[] makeSlotArray(Slot[] s){ //TODO not sure what this method does
+		s = new Slot[SP.length];
+		for (int i = 0; i < SP.length; i++){ 				//Changed <= to < so we dot exceed the array
+			s[i] = new Slot(SP[i].getNumber(), SP[i].getWidth(), SP[i].getHeight(), SP[i].getDepth(), 
+					SP[i].getPositionX(),SP[i].getPositionY(), SP[i].getLoadCapacity()); //use this to call the slots out in the find sutiable initialize get packet with null
+			s[i].setContainPacket(null);
+	
+		}
+	
+		return s;
+	}
+		
+	}
+	
+	
