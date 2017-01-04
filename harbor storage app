@@ -81,7 +81,7 @@ public class HarborStorageApp {
 		SimpleIO.print("3) Quit\n");
 		selection=SimpleIO.readInt();
 		switch (selection){
-		case 1:
+		case 1://case 1 calls the information and methods needed to store a packet
 			SimpleIO.print("Please give a description\n");
 			String description = nonBlankSting();
 			
@@ -105,7 +105,7 @@ public class HarborStorageApp {
 			
 			break;
 			
-		case 2:
+		case 2: //case 2 calls the needed methods to retrive a packet
 			SimpleIO.print("Please give a description\n");
 			String description1 = nonBlankSting();
 			try {
@@ -124,6 +124,6 @@ public class HarborStorageApp {
 		}
 		
 		}while(selection != 3);
-		HSM.shutdown();					//Misinterpreted the instructions, this is the only time the shutdown method should be called
+		HSM.shutdown();					// shutdown method is called when 3 is selected
 	}
 }
