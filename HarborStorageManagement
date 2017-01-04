@@ -156,7 +156,7 @@ public class HarborStorageManagement implements HighBayStorage {
 		return tempslot;
 	}
 	
-	private Slot[] makeSlotArray(Slot[] s){
+	private Slot[] makeSlotArray(Slot[] s){ //this method creates the slot storage array
 		s = new Slot[SP.length];
 		for (int i = 0; i < SP.length; i++){ 				//Changed <= to < so we don't exceed the array
 			s[i] = new Slot(SP[i].getNumber(), SP[i].getWidth(), SP[i].getHeight(), SP[i].getDepth(), 
