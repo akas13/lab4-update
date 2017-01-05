@@ -6,9 +6,9 @@ import de.tuhh.diss.io.SimpleIO;
 public class HarborStorageApp {
 	
 	private static HarborStorageManagement HSM;
-	//private Packet[] packetArray;
 	
-	private static void showAvaliblePackets() {			//This method creates an array of the stored packets and prints the information, but only if there are items in it
+	//This method creates an array of the stored packets and prints the information, but only if there are items in it
+	private static void showAvaliblePackets() {			
 		Packet[] packetArray;
 		packetArray = HSM.getPackets();
 		if(packetArray.length != 0){
@@ -23,38 +23,97 @@ public class HarborStorageApp {
 		}
 	}
 	
-	private static int realityCheck(){					//This method makes sure the numbers entered are greater than 0
+	//This method makes sure the description entered is not already being used for another packet
+	private static String nonRepeatingDescription(){
+		String des = nonBlankString();
+		boolean notRepeating = false;
+		Packet[] packetArray;
+		packetArray = HSM.getPackets();
+		while (notRepeating == false){
+			int count = 0;
+			for (int i = 0; i < packetArray.length; i++){
+				if (des.compareTo(packetArray[i].getDescription()) == 0){
+					SimpleIO.print("I'm sorry, the description you entered is already being used for another packet.\n");
+					SimpleIO.print("Please enter a new description and try again.\n");
+					des = nonBlankString();
+					break;
+				} else count++;
+			}
+			if (count == packetArray.length)
+				notRepeating = true;
+		}
+		return des;
+	}
+	
+	//This method makes sure the description entered is not blank
+	private static String nonBlankString(){				
+		boolean notBlank = false;
+		String des = SimpleIO.readString();
+		while (notBlank == false){
+			if ( des.compareTo("") != 0)
+				notBlank = true;
+			else {
+				SimpleIO.print("I'm sorry, the description you entered is blank.\n");
+				SimpleIO.print("Please enter a description that conatains at least one character.\n");
+				des = SimpleIO.readString();
+			}
+		}
+		return des;
+	}
+	
+	//This method makes sure the numbers entered are greater than 0
+	private static int realityCheck(){					
 		boolean Real = false;
-		int num = SimpleIO.readInt();
+		int num = readInt();
 		while (Real == false){
 			if (num > 0)
 				Real = true;
 			else {
 				SimpleIO.print("I'm sorry, the number you entered is not realistic.\n");
 				SimpleIO.print("Please enter a number greater than 0.\n");
-				num = SimpleIO.readInt();
+				num = readInt();
 			}
 		}
 		return num;
 	}
 	
-	
+	//This method catches the exception thrown by SimpleIO.readInt when a String is entered.
+	//If caught it informs the user of the mistake and asks them to try again.
+	private static int readInt(){
+		boolean string = true;
+		int num = 0;
+		while(string == true){
+			try{
+				num = SimpleIO.readInt();
+				string = false;
+			} catch (Exception e){
+				SimpleIO.print("I'm sorry, you entered something other than a whole number.\n");
+				SimpleIO.print("Please enter a number and try again.\n");
+			}
+		}
+		
+		
+		return num;
+	}
 	
 	public static void main (String[] args)  {
-	HSM = new HarborStorageManagement();				// This way HSM actually gets created, and program will run
+	HSM = new HarborStorageManagement();				
 	
 	int selection;
 		do{
-		showAvaliblePackets();							//Calls the showAvalibleMethod so it happens before the Main Menu every time
+		showAvaliblePackets();							
 		SimpleIO.print("\n\n*** Main Menu ***\n");
 		SimpleIO.print("1) Store a Packet\n");
 		SimpleIO.print("2) Retrieve a packet\n");
-		SimpleIO.print("3) Quit\n");
-		selection=SimpleIO.readInt();
+		SimpleIO.print("3) Print list of avalible slots\n");
+		SimpleIO.print("4) Quit\n");
+		selection = readInt();
 		switch (selection){
+		
+		//Case 1 calls the information and methods needed to store a packet
 		case 1:
 			SimpleIO.print("Please give a description\n");
-			String description = SimpleIO.readString();
+			String description = nonRepeatingDescription();
 			
 			SimpleIO.print("Please give the width of the packet\n");
 			int wi = realityCheck();
@@ -73,28 +132,32 @@ public class HarborStorageApp {
 			} catch (StorageException e) {
 				e.printStackTrace();
 			}
-			
 			break;
 			
-		case 2:
+		//Case 2 calls the needed methods to retrieve a packet	
+		case 2: 
 			SimpleIO.print("Please give a description\n");
-			String description1 = SimpleIO.readString();
+			String description1 = nonBlankString();
 			try {
 				HSM.retrievePacket(description1);
 			} catch (StorageException e) {
 				e.printStackTrace();
 			}
-			
+			break;
+		
+		//Case 3 prints the available slots for the user to see, and gives them the additional information of the slot size and load capacity
+		case 3:
+			HSM.printAvalibleSlots();
 			break;
 			
-		case 3:
+		//Case 4 ends the program	
+		case 4:
 			SimpleIO.print("Goodbye\n");
-			
 			break;
 		
 		}
 		
-		}while(selection != 3);
-		HSM.shutdown();					//Misinterpreted the instructions, this is the only time the shutdown method should be called
+		}while(selection != 4);
+		HSM.shutdown();					// shutdown method is called when the while statement is ended 
 	}
 }
